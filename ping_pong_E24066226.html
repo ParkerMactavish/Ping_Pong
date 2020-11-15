@@ -71,9 +71,9 @@
 
    .timeDisplaying {
       position: fixed;
-      width: 15%;
+      width: 20%;
       height: 6%;
-      top: 90%;
+      top: 80%;
       left: 3%;
       color: #efefef;
       font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
@@ -119,6 +119,8 @@
       <input type="range" min="1" max="10" value="1" class="speedSlider" id="speedSlider" onchange=changeSpeed()>
    </div>
    <div class="timeDisplaying" id="timeDisplaying">
+      <div id="bombCountLabel">Bomb Escaped:&#10</div>
+      <div id="bombCount"></div>
       <div class="durationLabel" id="durationLabel">Time:&#10</div>
       <div id="durationTime"></div>
    </div>

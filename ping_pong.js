@@ -31,16 +31,19 @@ const BALL_SIZE = 2;
  * {
  */
 var multipleOfHW;
-var movingPerUpdate = 0.1;
+var ballMovingPerUpdate = 0.1;
 var widthOfBar = 20;
 var heightOfBar = 5;
 var boundaryOfBar;
 var ballMovingDegree = -36;
+var bombsMovingPerUpdate = 0.2;
 /**
  * }
  */
+
 var balls = [];
 var bar;
+var bombs = [];
 
 /**
  * Speed controling group
@@ -59,6 +62,7 @@ var speedSetting;
  */
 var timeDisplaying;
 var durationLabel;
+var bombCount;
 /**
  * }
  */
@@ -106,12 +110,13 @@ var lastStartedTime;
  * }
  */
 
+
 /**
  * Position variables
  * {
  */
-var currentPos = new POS2D_t(0, 0);
-var nextPos = new POS2D_t(0, 0);
+var currentBall0Pos = new POS2D_t(0, 0);
+var nextBall0Pos = new POS2D_t(0, 0);
 var ballSize = new POS2D_t(0, 0);
 /* position of bar is set as (80, y) */
 /**
@@ -132,8 +137,8 @@ function normalizeDegree(degree) {
     return degree;
 }
 
-function willCollide(nextPos) {
-    var crossingX = (80 - ballSize.y - currentPos.y) / (nextPos.y - currentPos.y) * (nextPos.x - currentPos.x) + currentPos.x;
+function willCollide(nextBall0Pos) {
+    var crossingX = (80 - ballSize.y - currentBall0Pos.y) / (nextBall0Pos.y - currentBall0Pos.y) * (nextBall0Pos.x - currentBall0Pos.x) + currentBall0Pos.x;
     console.log("[Crossing X]", crossingX);
 
     if (bar.offsetLeft <= crossingX * window.innerWidth / 100 && bar.offsetLeft + widthOfBar * window.innerWidth / 100 > crossingX * window.innerWidth / 100)
@@ -156,6 +161,8 @@ function start() {
     timeDisplaying.style.fontSize = fontSize;
     durationLabel = document.getElementById("durationTime");
     durationLabel.innerHTML = "0.000";
+    bombCount = document.getElementById("bombCount");
+    bombCount.innerHTML = "0";
     lastStartedTime = Date.now();
 
     startButton = document.getElementById("start");
@@ -190,8 +197,8 @@ function start() {
     balls[4].style.height = ballSize.y + "%";
     balls[4].style.left = "0%";
     balls[4].style.top = "0%";
-    currentPos.set_Pos(0, 0);
-    movingPerUpdate = 1;
+    currentBall0Pos.set_Pos(0, 0);
+    ballMovingPerUpdate = 1;
 
     pauseButton = document.getElementById("pause");
     pauseButton.style.height = "10%";
@@ -215,7 +222,7 @@ function start() {
     failedLabel.style.fontSize = (Number(fontSize.split('e')[0]) * 2) + "em";
     failedLabel.style.visibility = "hidden";
     resultDurationTime = document.getElementById("resultDurationTime");
-    resultBombCount = document.getElementById("resultBOmbCount");
+    resultBombCount = document.getElementById("resultBombCount");
 
     restartButton = document.getElementById("restart");
     restartButton.style.height = "20%";
@@ -228,80 +235,102 @@ function start() {
         update(Infinity);
         // update(0);
     }, 10);
+    setTimeout(generateBomb, 1);
 }
 
 function update(times) {
     if (!times) return;
 
     else if (gameState == IN_MENU) {
-        nextPos.set_Pos(
-            currentPos.x - movingPerUpdate * Math.sin(degreeToGradian(ballMovingDegree)),
-            currentPos.y + movingPerUpdate * Math.cos(degreeToGradian(ballMovingDegree)) / multipleOfHW
+        nextBall0Pos.set_Pos(
+            currentBall0Pos.x - ballMovingPerUpdate * Math.sin(degreeToGradian(ballMovingDegree)),
+            currentBall0Pos.y + ballMovingPerUpdate * Math.cos(degreeToGradian(ballMovingDegree)) / multipleOfHW
         );
         console.log("--------------" + times);
-        console.log(nextPos);
-        if (nextPos.x > 100 - ballSize.x) {
-            nextPos.x = (100 - ballSize.x) * 2 - nextPos.x;
+        console.log(nextBall0Pos);
+        if (nextBall0Pos.x > 100 - ballSize.x) {
+            nextBall0Pos.x = (100 - ballSize.x) * 2 - nextBall0Pos.x;
             ballMovingDegree = - ballMovingDegree;
         }
-        else if (nextPos.x < 0) {
-            nextPos.x = -nextPos.x;
+        else if (nextBall0Pos.x < 0) {
+            nextBall0Pos.x = -nextBall0Pos.x;
             ballMovingDegree = - ballMovingDegree;
         }
-        if (nextPos.y > 100) {
+        if (nextBall0Pos.y > 100) {
             gameState = IN_DEAD;
         }
-        else if (nextPos.y > 100 - ballSize.y) {
-            nextPos.y = (100 - ballSize.y) * 2 - nextPos.y;
+        else if (nextBall0Pos.y > 100 - ballSize.y) {
+            nextBall0Pos.y = (100 - ballSize.y) * 2 - nextBall0Pos.y;
             ballMovingDegree = - (ballMovingDegree + 90) - 90;
         }
-        else if (nextPos.y < 0) {
-            nextPos.y = -nextPos.y;
+        else if (nextBall0Pos.y < 0) {
+            nextBall0Pos.y = -nextBall0Pos.y;
             ballMovingDegree = - (ballMovingDegree + 90) - 90;
         }
 
-        balls[4].style.left = nextPos.x + "%";
-        balls[4].style.top = nextPos.y + "%";
-        currentPos.set_Pos(nextPos.x, nextPos.y);
+        balls[4].style.left = nextBall0Pos.x + "%";
+        balls[4].style.top = nextBall0Pos.y + "%";
+        currentBall0Pos.set_Pos(nextBall0Pos.x, nextBall0Pos.y);
     }
     else if (gameState == IN_GAME) {
         for (var i = 4; i > 0; i--) {
             balls[i].style.left = balls[i - 1].offsetLeft;
             balls[i].style.top = balls[i - 1].offsetTop;
         }
-        nextPos.set_Pos(
-            currentPos.x - movingPerUpdate * Math.sin(degreeToGradian(ballMovingDegree)),
-            currentPos.y + movingPerUpdate * Math.cos(degreeToGradian(ballMovingDegree)) / multipleOfHW
+        nextBall0Pos.set_Pos(
+            currentBall0Pos.x - ballMovingPerUpdate * Math.sin(degreeToGradian(ballMovingDegree)),
+            currentBall0Pos.y + ballMovingPerUpdate * Math.cos(degreeToGradian(ballMovingDegree)) / multipleOfHW
         );
         console.log("--------------" + times);
-        console.log(nextPos);
-        if (nextPos.x > 100 - ballSize.x) {
-            nextPos.x = (100 - ballSize.x) * 2 - nextPos.x;
+        console.log(nextBall0Pos);
+        if (nextBall0Pos.x > 100 - ballSize.x) {
+            nextBall0Pos.x = (100 - ballSize.x) * 2 - nextBall0Pos.x;
             ballMovingDegree = - ballMovingDegree;
         }
-        else if (nextPos.x < 0) {
-            nextPos.x = -nextPos.x;
+        else if (nextBall0Pos.x < 0) {
+            nextBall0Pos.x = -nextBall0Pos.x;
             ballMovingDegree = - ballMovingDegree;
         }
-        if (nextPos.y > 100) {
+        if (nextBall0Pos.y > 100) {
             changeState(IN_DEAD);
         }
-        else if (nextPos.y + ballSize.y > 80 && currentPos.y + ballSize.y < 80 && willCollide(nextPos)) {
-            nextPos.y = (80 - ballSize.y) * 2 - nextPos.y;
+        else if (nextBall0Pos.y + ballSize.y > 80 && currentBall0Pos.y + ballSize.y < 80 && willCollide(nextBall0Pos)) {
+            nextBall0Pos.y = (80 - ballSize.y) * 2 - nextBall0Pos.y;
             ballMovingDegree = - (ballMovingDegree + 90) - 90;
         }
-        else if (nextPos.y < 0) {
-            nextPos.y = -nextPos.y;
+        else if (nextBall0Pos.y < 0) {
+            nextBall0Pos.y = -nextBall0Pos.y;
             ballMovingDegree = - (ballMovingDegree + 90) - 90;
         }
 
-        balls[0].style.left = nextPos.x + "%";
-        balls[0].style.top = nextPos.y + "%";
-        currentPos.set_Pos(nextPos.x, nextPos.y);
+        balls[0].style.left = nextBall0Pos.x + "%";
+        balls[0].style.top = nextBall0Pos.y + "%";
+        currentBall0Pos.set_Pos(nextBall0Pos.x, nextBall0Pos.y);
 
         ballMovingDegree = normalizeDegree(ballMovingDegree);
-        balls.forEach(_ => console.log(_));
+        // balls.forEach(_ => console.log(_));
 
+        var toRemove = false;
+        bombs.forEach(_ => {
+            var thisPosOf_ = Number(_.style.top.split('%')[0]);
+            var nextPosOf_ = thisPosOf_ + bombsMovingPerUpdate;
+            if (nextPosOf_ >= 100) {
+                try {
+                    document.body.removeChild(_);
+                }
+                catch { };
+                bombCount.innerHTML = Number(bombCount.innerHTML) + 1 + "";
+                toRemove = true;
+            }
+            else if (nextPosOf_ > 65 && thisPosOf_ < 80) {
+                if (Number(_.style.left.split('%')[0]) < bar.offsetLeft * 100 / window.innerWidth + widthOfBar && Number(_.style.left.split('%')[0]) + 5 > bar.offsetLeft * 100 / window.innerWidth) {
+                    changeState(IN_DEAD);
+                }
+            }
+            _.style.top = nextPosOf_ + "%";
+            console.log(nextPosOf_);
+        });
+        if (toRemove) bombs.splice(0, 1);
     }
     if (gameState == IN_GAME) durationLabel.innerHTML = (Date.now() - lastStartedTime) / 1000;
     else lastStartedTime = Date.now() - Number(durationLabel.innerHTML) * 1000;
@@ -338,12 +367,25 @@ document.onkeydown = function (e) {
         case IN_MENU:
             if (e.code == "Space")
                 changeState(IN_GAME);
+            break;
+        case IN_GAME:
+            if (e.code == "Space")
+                changeState(IN_PAUSE);
+            break;
+        case IN_PAUSE:
+            if (e.code == "Space")
+                changeState(IN_GAME);
+            break;
+        case IN_DEAD:
+            if (e.code == "Space")
+                changeState(IN_GAME);
+            break;
     }
 }
 
 function changeSpeed() {
     if (gameState == IN_PAUSE) return;
-    movingPerUpdate = speedController.value * 0.1;
+    ballMovingPerUpdate = speedController.value * 0.1;
     speedControllerLabel.innerHTML = speedControllerLabel.innerHTML.slice(0, 6) + ((speedController.value > 9) ? speedController.value : (" " + speedController.value));
 }
 
@@ -359,15 +401,26 @@ function changeState(state) {
                     _.style.visibility = "visible";
                     console.log(_);
                 });
-                currentPos.set_Pos(50 - ballSize.x, 50 - ballSize.y);
+                currentBall0Pos.set_Pos(50 - ballSize.x, 50 - ballSize.y);
                 lastStartedTime = Date.now();
-                movingPerUpdate = 0.1;
+                bombCount.innerHTML = "0";
+                ballMovingPerUpdate = 0.1;
                 ballMovingDegree = -37;
                 speedController.value = 1;
                 speedControllerLabel.innerHTML = "Speed: 1";
+                bombs.forEach(_ => {
+                    try {
+                        document.body.removeChild(_);
+                    }
+                    catch { }
+                });
+                bombs = [];
             }
             else {
                 balls.forEach(_ => {
+                    _.style.opacity = "1";
+                })
+                bombs.forEach(_ => {
                     _.style.opacity = "1";
                 })
             }
@@ -394,6 +447,9 @@ function changeState(state) {
             balls.forEach(_ => {
                 _.style.opacity = "0.4";
             })
+            bombs.forEach(_ => {
+                _.style.opacity = "0.4";
+            })
             bar.style.opacity = "0.4";
             timeDisplaying.style.opacity = "0.4";
             startButton.style.visibility = "visible";
@@ -407,7 +463,11 @@ function changeState(state) {
             balls.forEach(_ => {
                 _.style.visibility = "hidden";
             })
+            bombs.forEach(_ => {
+                _.style.visibility = "hidden";
+            })
             resultDurationTime.innerHTML = durationLabel.innerHTML + "&#10&#10";
+            resultBombCount.innerHTML = bombCount.innerHTML;
             failedLabel.style.visibility = "visible";
             restartButton.style.visibility = "visible";
             pauseButton.style.visibility = "hidden";
@@ -448,4 +508,19 @@ function set_speedSettingStyle(set = false) {
         speedController.classList.remove("speedSlider");
         speedController.classList.add("speedSlider_inPause");
     }
+}
+
+function generateBomb() {
+    var element = document.createElement("img");
+    element.src = "missile.png";
+    element.id = "bomb_" + bombs.length;
+    element.style = "position: absolute; visibility: visible;";
+    element.style.zIndex = "100";
+    element.style.width = 5 * multipleOfHW + "%";
+    element.style.height = "15%";
+    element.style.top = "-15%";
+    element.style.left = Math.random() * (100 - 7.5 * multipleOfHW) + "%";
+    document.body.appendChild(element);
+    bombs.push(element);
+    setTimeout(generateBomb, Math.random() * 10000 + 1000);
 }
