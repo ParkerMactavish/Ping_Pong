@@ -1,0 +1,87 @@
+﻿<head>
+   <title>Ping-Pong E24066226</title>
+   <script type="text/javascript" src = "./ping_pong.js"></script>
+</head>
+<style>
+   body { 
+      background-color: #000000;
+      overflow: hidden;
+      width: 100%;
+      cursor: none !important;
+   }
+
+   .speedSetting {
+      position: fixed;
+      width: 15%;
+      height: 8%;
+      top: 90%;
+      left: 82%;
+      opacity: 0.4;
+      background: black;
+      transition: opacity .05s;
+      cursor: none !important;
+      visibility: hidden;
+   }
+   .speedSetting:hover {
+      opacity: 1;
+      cursor: default;
+   }
+
+   .speedSettingLabel {
+      color: #efefef;
+      font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+   }
+
+   .speedSlider {
+      -webkit-appearance: none;
+      position: relative;
+      width: 100%;
+      height: 40%;
+      background: #ffffff;
+      outline:none;
+   }
+   .speedSlider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 10%;
+      height: 100%;
+      background: #666666;
+      cursor: pointer;
+   }
+
+   .timeDisplaying {
+      position: fixed;
+      width: 15%;
+      height: 6%;
+      top: 90%;
+      left: 3%;
+      color: #efefef;
+      font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+      cursor: none !important;
+      visibility: hidden;
+   }
+   .timeDisplaying:hover {
+      cursor: none;
+   }
+</style>
+<body onLoad=start() style="cursor: none !important;">
+   <img src="ball0.png" id="ball0" style="position: absolute; z-index: 1; visibility: hidden; cursor: none !important;"/>
+   <img src="ball1.png" id="ball1" style="position: absolute; z-index: 2; visibility:hidden; cursor: none !important;"/>
+   <img src="ball2.png" id="ball2" style="position: absolute; z-index: 3; visibility: hidden; cursor: none !important;"/>
+   <img src="ball3.png" id="ball3" style="position: absolute; z-index: 4; visibility: hidden; cursor: none !important;"/>
+   <img src="ball4.png" id="ball4" style="position: absolute; z-index: 5; visibility: hidden; cursor: none !important;"/>
+   <img src="bar.png" id="bar" style="position: absolute; z-index: 6; visibility: hidden; cursor: none !important;"/>
+   <img src="play.png" id="start" class="startButton" style="position: absolute; visibility: hidden; z-index: 7; cursor: none !important;" onclick="changeState(IN_GAME);"/>
+   <img src="Title.png" id="title" style="position: absolute; visibility: hiddne; z-index: 8; cursor: none !important;"/>
+   <div class="speedSetting" id="speedSetting">
+      <div class="speedSettingLabel" id="speedSettingLabel" align="right">Speed: 1</div>
+      <input type="range" min="1" max="10" value="1" class="speedSlider" id="speedSlider" onchange=changeSpeed()>
+   </div>
+   <div class="timeDisplaying" id="timeDisplaying">
+      <div class="durationLabel" id="durationLabel">Time:&#10</div>
+      <div id="durationTime"></div>
+   </div>
+   <img src="pause.png" id="pause" style="position: absolute; visibility: hiddne; z-index: 8; cursor: none !important;" onclick="changeState(IN_PAUSE)"/>
+   <img src="paused_lable.png" id="paused_label" style="position: absolute; visibility: hiddne; z-index: 8; cursor: none !important;"/>
+</body>
+</html>
