@@ -11,6 +11,15 @@ class POS2D_t {
     }
 }
 
+class BOMB_AND_SPEED_t {
+    bomb;
+    speed;
+    constructor(bomb_, speed_) {
+        this.bomb = bomb_;
+        this.speed = speed_;
+    }
+}
+
 /**
  * Game State Definition
  * {
@@ -37,6 +46,7 @@ var heightOfBar = 5;
 var boundaryOfBar;
 var ballMovingDegree = -36;
 var bombsMovingPerUpdate = 0.2;
+var bombsAccelPerUpdate = 0.03;
 /**
  * }
  */
@@ -312,22 +322,23 @@ function update(times) {
 
         var toRemove = false;
         bombs.forEach(_ => {
-            var thisPosOf_ = Number(_.style.top.split('%')[0]);
-            var nextPosOf_ = thisPosOf_ + bombsMovingPerUpdate;
+            var thisPosOf_ = Number(_.bomb.style.top.split('%')[0]);
+            _.speed += bombsAccelPerUpdate;
+            var nextPosOf_ = thisPosOf_ + _.speed;
             if (nextPosOf_ >= 100) {
                 try {
-                    document.body.removeChild(_);
+                    document.body.removeChild(_.bomb);
                 }
                 catch { };
                 bombCount.innerHTML = Number(bombCount.innerHTML) + 1 + "";
                 toRemove = true;
             }
             else if (nextPosOf_ > 65 && thisPosOf_ < 80) {
-                if (Number(_.style.left.split('%')[0]) < bar.offsetLeft * 100 / window.innerWidth + widthOfBar && Number(_.style.left.split('%')[0]) + 5 > bar.offsetLeft * 100 / window.innerWidth) {
+                if (Number(_.bomb.style.left.split('%')[0]) < bar.offsetLeft * 100 / window.innerWidth + widthOfBar && Number(_.bomb.style.left.split('%')[0]) + 5 > bar.offsetLeft * 100 / window.innerWidth) {
                     changeState(IN_DEAD);
                 }
             }
-            _.style.top = nextPosOf_ + "%";
+            _.bomb.style.top = nextPosOf_ + "%";
             console.log(nextPosOf_);
         });
         if (toRemove) bombs.splice(0, 1);
@@ -410,7 +421,7 @@ function changeState(state) {
                 speedControllerLabel.innerHTML = "Speed: 1";
                 bombs.forEach(_ => {
                     try {
-                        document.body.removeChild(_);
+                        document.body.removeChild(_.bomb);
                     }
                     catch { }
                 });
@@ -421,7 +432,7 @@ function changeState(state) {
                     _.style.opacity = "1";
                 })
                 bombs.forEach(_ => {
-                    _.style.opacity = "1";
+                    _.bomb.style.opacity = "1";
                 })
             }
             if (gameState == IN_PAUSE) {
@@ -448,7 +459,7 @@ function changeState(state) {
                 _.style.opacity = "0.4";
             })
             bombs.forEach(_ => {
-                _.style.opacity = "0.4";
+                _.bomb.style.opacity = "0.4";
             })
             bar.style.opacity = "0.4";
             timeDisplaying.style.opacity = "0.4";
@@ -464,7 +475,7 @@ function changeState(state) {
                 _.style.visibility = "hidden";
             })
             bombs.forEach(_ => {
-                _.style.visibility = "hidden";
+                _.bomb.style.visibility = "hidden";
             })
             resultDurationTime.innerHTML = durationLabel.innerHTML + "&#10&#10";
             resultBombCount.innerHTML = bombCount.innerHTML;
@@ -521,6 +532,7 @@ function generateBomb() {
     element.style.top = "-15%";
     element.style.left = Math.random() * (100 - 7.5 * multipleOfHW) + "%";
     document.body.appendChild(element);
-    bombs.push(element);
+    var bomb = new BOMB_AND_SPEED_t(element, bombsMovingPerUpdate);
+    bombs.push(bomb);
     setTimeout(generateBomb, Math.random() * 10000 + 1000);
 }
