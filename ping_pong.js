@@ -47,7 +47,7 @@ var boundaryOfBar;
 var ballMovingDegree = -36;
 var bombsMovingPerUpdate = 0.2;
 var bombsAccelPerUpdate = 0.03;
-var bombsFrequency = 10000;
+var bombsFrequency = 11000;
 /**
  * }
  */
@@ -105,6 +105,16 @@ var pausedLabel;
  * {
  */
 var pauseButton;
+/**
+ * }
+ */
+
+/**
+ * About button
+ * {
+ */
+var aboutButton;
+var aboutContent;
 /**
  * }
  */
@@ -175,7 +185,7 @@ function normalizeDegree(degree) {
 
 function willCollide(nextBall0Pos) {
     var crossingX = (80 - ballSize.y - currentBall0Pos.y) / (nextBall0Pos.y - currentBall0Pos.y) * (nextBall0Pos.x - currentBall0Pos.x) + currentBall0Pos.x;
-    console.log("[Crossing X]", crossingX);
+    // console.log("[Crossing X]", crossingX);
 
     if (bar.offsetLeft <= crossingX * window.innerWidth / 100 && bar.offsetLeft + widthOfBar * window.innerWidth / 100 > crossingX * window.innerWidth / 100)
         return true;
@@ -249,6 +259,22 @@ function start() {
     pauseButton.style.left = "2.5%";
     pauseButton.style.visibility = "hidden";
 
+    aboutButton = document.getElementById("show_about");
+    aboutButton.style.height = "8%";
+    aboutButton.style.width = 8 * multipleOfHW + "%";
+    aboutButton.style.top = "70%";
+    aboutButton.style.left = "2.5%";
+    aboutButton.style.visibility = "visible";
+    aboutButton.onmousedown = show_about;
+    aboutButton.onmouseup = remove_about;
+
+    aboutContent = document.getElementById("about");
+    aboutContent.style.visibility = "hidden";
+    aboutContent.style.height = "50%";
+    aboutContent.style.width = 100 * multipleOfHW + "%";
+    aboutContent.style.bottom = "25%";
+    aboutContent.style.left = 2.5 + 8 * multipleOfHW + "%";
+
     pausedLabel = document.getElementById("paused_label");
     pausedLabel.style.height = "20%";
     pausedLabel.style.width = 50 * multipleOfHW + "%";
@@ -288,8 +314,8 @@ function update(times) {
             currentBall0Pos.x - ballMovingPerUpdate * Math.sin(degreeToGradian(ballMovingDegree)),
             currentBall0Pos.y + ballMovingPerUpdate * Math.cos(degreeToGradian(ballMovingDegree)) / multipleOfHW
         );
-        console.log("--------------" + times);
-        console.log(nextBall0Pos);
+        // console.log("--------------" + times);
+        // console.log(nextBall0Pos);
         if (nextBall0Pos.x > 100 - ballSize.x) {
             nextBall0Pos.x = (100 - ballSize.x) * 2 - nextBall0Pos.x;
             ballMovingDegree = - ballMovingDegree - 10 + Math.random() * 20;
@@ -399,6 +425,10 @@ window.onresize = function () {
     pauseButton.style.width = 10 * multipleOfHW + "%";
     pauseButton.style.top = "2.5%";
     pauseButton.style.left = "2.5%";
+    aboutButton.style.height = "8%";
+    aboutButton.style.width = 8 * multipleOfHW + "%";
+    aboutButton.style.top = "70%";
+    aboutButton.style.left = "2.5%";
 }
 
 document.onkeydown = function (e) {
@@ -506,8 +536,10 @@ function changeState(state) {
                 lastStartedTime = Date.now();
                 bombCount.innerHTML = "0";
                 ballMovingPerUpdate = 0.1;
+                bombsFrequency = 11000;
                 ballMovingDegree = -37;
                 ballSpeedController.value = 1;
+                bombSpeedController.value = 1;
                 ballSpeedControllerLabel.innerHTML = "Ball Speed: 1";
                 bombSpeedControllerLabel.innerHTML = "Bomb Density: 1";
                 bombs.forEach(_ => {
@@ -528,6 +560,7 @@ function changeState(state) {
             }
             if (gameState == IN_PAUSE) {
                 ballSpeedController.disabled = false;
+                bombSpeedController.disabled = false;
                 // ballSpeedController.classList.toggle("ballSpeedSlider");
                 // ballSpeedController.classList.toggle("ballSpeedSlider_inPause");
                 set_speedSettingStyle(true, false);
@@ -565,7 +598,6 @@ function changeState(state) {
             bombSpeedController.disabled = true;
             set_speedSettingStyle(false, false);
             set_speedSettingStyle(false, true);
-            set_
             break;
         case IN_DEAD:
             balls.forEach(_ => {
@@ -653,12 +685,37 @@ function generateBomb() {
     element.style.left = Math.random() * (100 - 7.5 * multipleOfHW) + "%";
     document.body.appendChild(element);
     var bomb = new BOMB_AND_SPEED_t(element, bombsMovingPerUpdate);
-    bombs.push(bomb);
-    setTimeout(generateBomb, Math.random() * bombsFrequency + 1000);
+    if (gameState == IN_GAME)
+        setTimeout(commit_or_delay, 10, bomb, 1);
+    else
+        setTimeout(commit_or_delay, 10, bomb, Infinity);
+}
+
+function commit_or_delay(bomb, delayTimes) {
+    console.log(Date.now());
+    if (gameState != IN_GAME) {
+        setTimeout(commit_or_delay, 10, bomb, Infinity);
+    }
+    else if (delayTimes) {
+        setTimeout(commit_or_delay, Math.random() * bombsFrequency + 1000, bomb, 0);
+    }
+    else {
+        bombs.push(bomb);
+        setTimeout(generateBomb, 10);
+    }
 }
 
 function changeBombFrequency() {
     if (gameState == IN_PAUSE) return;
-    bombsFrequency = 10000 - bombSpeedController.value * 1000;
+    bombsFrequency = 11000 - bombSpeedController.value * 1000;
     bombSpeedControllerLabel.innerHTML = "Bomb Density:" + ((bombSpeedController.value > 9) ? bombSpeedController.value : (" " + bombSpeedController.value));
+}
+
+function show_about() {
+    aboutContent.style.visibility = "visible";
+}
+
+function remove_about() {
+    console.log("===fsd=fagadgsdf");
+    aboutContent.style.visibility = "hidden";
 }

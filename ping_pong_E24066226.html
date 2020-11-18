@@ -28,14 +28,16 @@
    }
 
    .bombSpeedSetting {
-      top: 80%;
+      top: 5%;
       left: 82%;
    }
 
    .speedSettingLabel {
+      -webkit-text-stroke: 1px black;
       color: #efefef;
       font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
       cursor: url("cursor.cur"), auto;
+      z-index: 1;
    }
 
    .speedSlider {
@@ -101,18 +103,21 @@
 </style>
 
 <body onLoad=start()>
-   <img src="ball0.png" id="ball0" style="position: absolute; z-index: 1; visibility: hidden;" />
-   <img src="ball1.png" id="ball1" style="position: absolute; z-index: 2; visibility:hidden;" />
-   <img src="ball2.png" id="ball2" style="position: absolute; z-index: 3; visibility: hidden;" />
-   <img src="ball3.png" id="ball3" style="position: absolute; z-index: 4; visibility: hidden;" />
-   <img src="ball4.png" id="ball4" style="position: absolute; z-index: 5; visibility: hidden;" />
-   <img src="bar.png" id="bar" style="position: absolute; z-index: 6; visibility: hidden;" />
-   <img src="play.png" id="start" class="button" style="position: absolute; visibility: hidden; z-index: 7;"
+   <img src="ball0.png" id="ball0" style="position: absolute; z-index: 100; visibility: hidden;" />
+   <img src="ball1.png" id="ball1" style="position: absolute; z-index: 99; visibility:hidden;" />
+   <img src="ball2.png" id="ball2" style="position: absolute; z-index: 98; visibility: hidden;" />
+   <img src="ball3.png" id="ball3" style="position: absolute; z-index: 97; visibility: hidden;" />
+   <img src="ball4.png" id="ball4" style="position: absolute; z-index: 96; visibility: hidden;" />
+   <img src="bar.png" id="bar" style="position: absolute; z-index: 95; visibility: hidden;" />
+   <img src="play.png" id="start" class="button" style="position: absolute; visibility: hidden; z-index: 94;"
       onclick="changeState(IN_GAME);" />
-   <img src="Title.png" id="title" style="position: absolute; visibility: hidden; z-index: 8;" />
-   <img src="pause.png" id="pause" class="button" style="position: absolute; visibility: hidden; z-index: 8;"
+   <img src="Title.png" id="title" style="position: absolute; visibility: hidden; z-index: 93;" />
+   <img src="pause.png" id="pause" class="button" style="position: absolute; visibility: hidden; z-index: 93;"
       onclick="changeState(IN_PAUSE)" />
-   <img src="paused_lable.png" id="paused_label" style="position: absolute; visibility: hidden; z-index: 8;" />
+   <img src="paused_lable.png" id="paused_label" style="position: absolute; visibility: hidden; z-index: 93;" />
+   <img src="question_mark.png" id="show_about" class="button"
+      style="position: absolute; visibility: hidden; z-index: 93;" />
+   <img src="about.png" id="about" style="position: absolute; visibility: hidden; z-index: 100000;" />
    <div id="failed_label" class="resultDisplaying" align="center">
       <div id="resultDurationLabel">Time Last:&#10</div>
       <div id="resultDurationTime"></div>
