@@ -59,11 +59,15 @@ var bombs = [];
  * Speed controling group
  * {
  */
-var speedController;
-var speedControllerLabel;
-var speedSetting;
+var ballSpeedController;
+var ballSpeedControllerLabel;
+var ballSpeedSetting;
 /**
  * }
+ */
+
+/**
+ * Bom
  */
 
 /**
@@ -133,6 +137,20 @@ var ballSize = new POS2D_t(0, 0);
  * }
  */
 
+/**
+ * Store Arrows and Shift keydown
+ * {
+ */
+var isPressed = {
+    shift: false,
+    up: false,
+    down: false
+}
+/**
+ * }
+ */
+
+
 function degreeToGradian(degree) {
     return degree * Math.PI / 180;
 }
@@ -159,15 +177,15 @@ function willCollide(nextBall0Pos) {
 function start() {
     multipleOfHW = window.innerHeight / window.innerWidth;
 
-    speedSetting = document.getElementById("speedSetting");
-    speedController = document.getElementById("speedSlider");
-    speedControllerLabel = document.getElementById("speedSettingLabel");
-    set_speedSettingStyle(true);
+    ballSpeedSetting = document.getElementById("ballSpeedSetting");
+    ballSpeedController = document.getElementById("ballSpeedSlider");
+    ballSpeedControllerLabel = document.getElementById("ballSpeedSettingLabel");
+    set_ballSpeedSettingStyle(true);
 
     timeDisplaying = document.getElementById("timeDisplaying");
 
     fontSize = window.innerHeight / 929 * 2 + "em";
-    speedControllerLabel.style.fontSize = fontSize;
+    ballSpeedControllerLabel.style.fontSize = fontSize;
     timeDisplaying.style.fontSize = fontSize;
     durationLabel = document.getElementById("durationTime");
     durationLabel.innerHTML = "0.000";
@@ -359,7 +377,7 @@ window.onresize = function () {
         _.style.height = ballSize.y + "%";
     });
     fontSize = window.innerHeight / 929 * 2 + "em";
-    speedControllerLabel.style.fontSize = fontSize;
+    ballSpeedControllerLabel.style.fontSize = fontSize;
     timeDisplaying.style.fontSize = fontSize;
     failedLabel.style.fontSize = fontSize * 3;
     boundaryOfBar = Math.round(window.innerWidth * (1 - widthOfBar / 100), 0);
@@ -374,30 +392,77 @@ window.onresize = function () {
 }
 
 document.onkeydown = function (e) {
+    var code = e.code;
     switch (gameState) {
         case IN_MENU:
-            if (e.code == "Space")
+            if (code == "Space")
                 changeState(IN_GAME);
             break;
         case IN_GAME:
-            if (e.code == "Space")
+            if (code == "Space") {
                 changeState(IN_PAUSE);
+            }
+            else if (code == "ArrowUp") {
+                isPressed.up = true;
+            }
+            else if (code == "ArrowDown") {
+                isPressed.down = true;
+            }
+            else if (code == "ShiftLeft") {
+                isPressed.shift = true;
+                console.log("Shift Pressed");
+            }
+            else if (code == "ArrowLeft") {
+
+            }
             break;
         case IN_PAUSE:
-            if (e.code == "Space")
+            if (code == "Space") {
                 changeState(IN_GAME);
+            }
             break;
         case IN_DEAD:
-            if (e.code == "Space")
+            if (code == "Space")
                 changeState(IN_GAME);
             break;
     }
 }
 
+document.onkeyup = function (e) {
+    var code = e.code;
+    if (gameState == IN_GAME){
+        if (code == "ShiftLeft") {
+            isPressed.shift = false;
+            console.log("Shift Released");
+        }
+        else if (code == "ArrowUp") {
+            isPressed.up = false;
+            if(isPressed.shift) {
+                console.log("Hey");
+            }
+            else {
+                var oldValue = Number(ballSpeedController.value);
+                ballSpeedController.value = (oldValue < 10) ? oldValue + 1 + "" : ballSpeedController.value;
+                changeSpeed();
+            }
+        }
+        else if (code == "ArrowDown") {
+            isPressed.down = false;
+            if(isPressed.shift) {
+            }
+            else {
+                var oldValue = Number(ballSpeedController.value);
+                ballSpeedController.value = (oldValue > 1) ? oldValue - 1 + "" : ballSpeedController.value;
+                changeSpeed();
+            }
+        }
+    }
+}
+
 function changeSpeed() {
     if (gameState == IN_PAUSE) return;
-    ballMovingPerUpdate = speedController.value * 0.1;
-    speedControllerLabel.innerHTML = speedControllerLabel.innerHTML.slice(0, 6) + ((speedController.value > 9) ? speedController.value : (" " + speedController.value));
+    ballMovingPerUpdate = ballSpeedController.value * 0.1;
+    ballSpeedControllerLabel.innerHTML = ballSpeedControllerLabel.innerHTML.slice(0, 6) + ((ballSpeedController.value > 9) ? ballSpeedController.value : (" " + ballSpeedController.value));
 }
 
 function changeState(state) {
@@ -417,8 +482,8 @@ function changeState(state) {
                 bombCount.innerHTML = "0";
                 ballMovingPerUpdate = 0.1;
                 ballMovingDegree = -37;
-                speedController.value = 1;
-                speedControllerLabel.innerHTML = "Speed: 1";
+                ballSpeedController.value = 1;
+                ballSpeedControllerLabel.innerHTML = "Speed: 1";
                 bombs.forEach(_ => {
                     try {
                         document.body.removeChild(_.bomb);
@@ -436,17 +501,17 @@ function changeState(state) {
                 })
             }
             if (gameState == IN_PAUSE) {
-                speedController.disabled = false;
-                // speedController.classList.toggle("speedSlider");
-                // speedController.classList.toggle("speedSlider_inPause");
-                set_speedSettingStyle(true);
+                ballSpeedController.disabled = false;
+                // ballSpeedController.classList.toggle("ballSpeedSlider");
+                // ballSpeedController.classList.toggle("ballSpeedSlider_inPause");
+                set_ballSpeedSettingStyle(true);
             }
             bar.style.visibility = "visible";
             bar.style.opacity = "1";
             title.style.visibility = "hidden";
             startButton.style.visibility = "hidden";
-            speedControllerLabel.style.visibility = "visible";
-            speedController.style.visibility = "visible";
+            ballSpeedControllerLabel.style.visibility = "visible";
+            ballSpeedController.style.visibility = "visible";
             timeDisplaying.style.visibility = "visible";
             timeDisplaying.style.opacity = "1";
             pauseButton.style.visibility = "visible";
@@ -467,8 +532,8 @@ function changeState(state) {
             pausedLabel.style.visibility = "visible";
             pauseButton.style.visibility = "hidden";
             gameState = IN_PAUSE;
-            speedController.disabled = true;
-            set_speedSettingStyle(false);
+            ballSpeedController.disabled = true;
+            set_ballSpeedSettingStyle(false);
             break;
         case IN_DEAD:
             balls.forEach(_ => {
@@ -483,8 +548,8 @@ function changeState(state) {
             restartButton.style.visibility = "visible";
             pauseButton.style.visibility = "hidden";
             timeDisplaying.style.visibility = "hidden";
-            speedController.style.visibility = "hidden";
-            speedControllerLabel.style.visibility = "hidden";
+            ballSpeedController.style.visibility = "hidden";
+            ballSpeedControllerLabel.style.visibility = "hidden";
             bar.style.visibility = "hidden";
             break;
     }
@@ -502,22 +567,22 @@ function set_Mouse(e) {
     }
 }
 
-function set_speedSettingStyle(set = false) {
+function set_ballSpeedSettingStyle(set = false) {
     if (set) {
-        speedSetting.onmouseover = function () {
-            speedSetting.style.opacity = "1";
+        ballSpeedSetting.onmouseover = function () {
+            ballSpeedSetting.style.opacity = "1";
         };
-        speedSetting.onmouseout = function () {
-            speedSetting.style.opacity = "0.4";
+        ballSpeedSetting.onmouseout = function () {
+            ballSpeedSetting.style.opacity = "0.4";
         };
-        speedController.classList.add("speedSlider");
-        speedController.classList.remove("speedSlider_inPause");
+        ballSpeedController.classList.add("ballSpeedSlider");
+        ballSpeedController.classList.remove("ballSpeedSlider_inPause");
     }
     else {
-        speedSetting.onmouseover = undefined;
-        speedSetting.onmouseout = undefined;
-        speedController.classList.remove("speedSlider");
-        speedController.classList.add("speedSlider_inPause");
+        ballSpeedSetting.onmouseover = undefined;
+        ballSpeedSetting.onmouseout = undefined;
+        ballSpeedController.classList.remove("ballSpeedSlider");
+        ballSpeedController.classList.add("ballSpeedSlider_inPause");
     }
 }
 

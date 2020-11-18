@@ -10,7 +10,7 @@
       cursor: url("cursor.cur"), auto;
    }
 
-   .speedSetting {
+   .ballSpeedSetting {
       position: fixed;
       width: 15%;
       height: 8%;
@@ -25,13 +25,13 @@
    }
 
 
-   .speedSettingLabel {
+   .ballSpeedSettingLabel {
       color: #efefef;
       font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
       cursor: url("cursor.cur"), auto;
    }
 
-   .speedSlider {
+   .ballSpeedSlider {
       -webkit-appearance: none;
       position: relative;
       width: 100%;
@@ -41,7 +41,7 @@
       cursor: pointer;
    }
 
-   .speedSlider::-webkit-slider-thumb {
+   .ballSpeedSlider::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
       width: 10%;
@@ -50,7 +50,7 @@
       cursor: pointer;
    }
 
-   .speedSlider_inPause {
+   .ballSpeedSlider_inPause {
       -webkit-appearance: none;
       position: relative;
       width: 100%;
@@ -60,7 +60,7 @@
       cursor: url("cursor.cur"), auto;
    }
 
-   .speedSlider_inPause::-webkit-slider-thumb {
+   .ballSpeedSlider_inPause::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
       width: 10%;
@@ -114,9 +114,9 @@
    </div>
    <img src="restart.png" id="restart" class="button" style="position: absolute; visibility: hidden;"
       onclick="changeState(IN_GAME)" />
-   <div class="speedSetting" id="speedSetting">
-      <div class="speedSettingLabel" id="speedSettingLabel" align="right">Speed: 1</div>
-      <input type="range" min="1" max="10" value="1" class="speedSlider" id="speedSlider" onchange=changeSpeed()>
+   <div class="ballSpeedSetting" id="ballSpeedSetting">
+      <div class="ballSpeedSettingLabel" id="ballSpeedSettingLabel" align="right">Speed: 1</div>
+      <input type="range" min="1" max="10" value="1" class="ballSpeedSlider" id="ballSpeedSlider" onchange=changeSpeed()>
    </div>
    <div class="timeDisplaying" id="timeDisplaying">
       <div id="bombCountLabel">Bomb Escaped:&#10</div>
