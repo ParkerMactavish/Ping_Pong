@@ -10,12 +10,10 @@
       cursor: url("cursor.cur"), auto;
    }
 
-   .ballSpeedSetting {
+   .speedSetting {
       position: fixed;
       width: 15%;
       height: 8%;
-      top: 90%;
-      left: 82%;
       opacity: 0.4;
       background: black;
       transition: opacity .05s;
@@ -24,14 +22,23 @@
       cursor: pointer;
    }
 
+   .ballSpeedSetting {
+      top: 90%;
+      left: 82%;
+   }
 
-   .ballSpeedSettingLabel {
+   .bombSpeedSetting {
+      top: 80%;
+      left: 82%;
+   }
+
+   .speedSettingLabel {
       color: #efefef;
       font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
       cursor: url("cursor.cur"), auto;
    }
 
-   .ballSpeedSlider {
+   .speedSlider {
       -webkit-appearance: none;
       position: relative;
       width: 100%;
@@ -41,7 +48,7 @@
       cursor: pointer;
    }
 
-   .ballSpeedSlider::-webkit-slider-thumb {
+   .speedSlider::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
       width: 10%;
@@ -50,7 +57,7 @@
       cursor: pointer;
    }
 
-   .ballSpeedSlider_inPause {
+   .speedSlider_inPause {
       -webkit-appearance: none;
       position: relative;
       width: 100%;
@@ -60,7 +67,7 @@
       cursor: url("cursor.cur"), auto;
    }
 
-   .ballSpeedSlider_inPause::-webkit-slider-thumb {
+   .speedSlider_inPause::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
       width: 10%;
@@ -114,9 +121,15 @@
    </div>
    <img src="restart.png" id="restart" class="button" style="position: absolute; visibility: hidden;"
       onclick="changeState(IN_GAME)" />
-   <div class="ballSpeedSetting" id="ballSpeedSetting">
-      <div class="ballSpeedSettingLabel" id="ballSpeedSettingLabel" align="right">Speed: 1</div>
-      <input type="range" min="1" max="10" value="1" class="ballSpeedSlider" id="ballSpeedSlider" onchange=changeSpeed()>
+   <div class="speedSetting ballSpeedSetting" id="ballSpeedSetting">
+      <div class="speedSettingLabel" id="ballSpeedSettingLabel" align="right">Ball Speed: 1</div>
+      <input type="range" min="1" max="10" value="1" class="speedSlider" id="ballSpeedSlider"
+         onchange=changeBallSpeed()>
+   </div>
+   <div class="speedSetting bombSpeedSetting" id="bombSpeedSetting">
+      <div class="speedSettingLabel" id="bombSpeedSettingLabel" align="right">Bomb Density: 1</div>
+      <input type="range" min="1" max="10" value="1" class="speedSlider" id="bombSpeedSlider"
+         onchange=changeBombFrequency()>
    </div>
    <div class="timeDisplaying" id="timeDisplaying">
       <div id="bombCountLabel">Bomb Escaped:&#10</div>

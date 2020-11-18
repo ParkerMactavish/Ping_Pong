@@ -47,6 +47,7 @@ var boundaryOfBar;
 var ballMovingDegree = -36;
 var bombsMovingPerUpdate = 0.2;
 var bombsAccelPerUpdate = 0.03;
+var bombsFrequency = 10000;
 /**
  * }
  */
@@ -56,7 +57,7 @@ var bar;
 var bombs = [];
 
 /**
- * Speed controling group
+ * Ball speed controling group
  * {
  */
 var ballSpeedController;
@@ -67,7 +68,14 @@ var ballSpeedSetting;
  */
 
 /**
- * Bom
+ * Bomb speed controling group
+ * {
+ */
+var bombSpeedController;
+var bombSpeedControllerLabel;
+var bombSpeedSetting;
+/**
+ * }
  */
 
 /**
@@ -180,12 +188,18 @@ function start() {
     ballSpeedSetting = document.getElementById("ballSpeedSetting");
     ballSpeedController = document.getElementById("ballSpeedSlider");
     ballSpeedControllerLabel = document.getElementById("ballSpeedSettingLabel");
-    set_ballSpeedSettingStyle(true);
+    set_speedSettingStyle(true, false);
+
+    bombSpeedSetting = document.getElementById("bombSpeedSetting");
+    bombSpeedController = document.getElementById("bombSpeedSlider");
+    bombSpeedControllerLabel = document.getElementById("bombSpeedSettingLabel");
+    set_speedSettingStyle(true, true);
 
     timeDisplaying = document.getElementById("timeDisplaying");
 
     fontSize = window.innerHeight / 929 * 2 + "em";
     ballSpeedControllerLabel.style.fontSize = fontSize;
+    bombSpeedControllerLabel.style.fontSize = fontSize;
     timeDisplaying.style.fontSize = fontSize;
     durationLabel = document.getElementById("durationTime");
     durationLabel.innerHTML = "0.000";
@@ -278,22 +292,19 @@ function update(times) {
         console.log(nextBall0Pos);
         if (nextBall0Pos.x > 100 - ballSize.x) {
             nextBall0Pos.x = (100 - ballSize.x) * 2 - nextBall0Pos.x;
-            ballMovingDegree = - ballMovingDegree;
+            ballMovingDegree = - ballMovingDegree - 10 + Math.random() * 20;
         }
         else if (nextBall0Pos.x < 0) {
             nextBall0Pos.x = -nextBall0Pos.x;
-            ballMovingDegree = - ballMovingDegree;
+            ballMovingDegree = - ballMovingDegree - 10 + Math.random() * 20;
         }
-        if (nextBall0Pos.y > 100) {
-            gameState = IN_DEAD;
-        }
-        else if (nextBall0Pos.y > 100 - ballSize.y) {
+        if (nextBall0Pos.y > 100 - ballSize.y) {
             nextBall0Pos.y = (100 - ballSize.y) * 2 - nextBall0Pos.y;
-            ballMovingDegree = - (ballMovingDegree + 90) - 90;
+            ballMovingDegree = - (ballMovingDegree + 90) - 90 - 10 + Math.random() * 20;
         }
         else if (nextBall0Pos.y < 0) {
             nextBall0Pos.y = -nextBall0Pos.y;
-            ballMovingDegree = - (ballMovingDegree + 90) - 90;
+            ballMovingDegree = - (ballMovingDegree + 90) - 90 - 10 + Math.random() * 20;
         }
 
         balls[4].style.left = nextBall0Pos.x + "%";
@@ -309,26 +320,24 @@ function update(times) {
             currentBall0Pos.x - ballMovingPerUpdate * Math.sin(degreeToGradian(ballMovingDegree)),
             currentBall0Pos.y + ballMovingPerUpdate * Math.cos(degreeToGradian(ballMovingDegree)) / multipleOfHW
         );
-        console.log("--------------" + times);
-        console.log(nextBall0Pos);
         if (nextBall0Pos.x > 100 - ballSize.x) {
             nextBall0Pos.x = (100 - ballSize.x) * 2 - nextBall0Pos.x;
-            ballMovingDegree = - ballMovingDegree;
+            ballMovingDegree = - ballMovingDegree - 10 + Math.random() * 20;
         }
         else if (nextBall0Pos.x < 0) {
             nextBall0Pos.x = -nextBall0Pos.x;
-            ballMovingDegree = - ballMovingDegree;
+            ballMovingDegree = - ballMovingDegree - 10 + Math.random() * 20;
         }
         if (nextBall0Pos.y > 100) {
             changeState(IN_DEAD);
         }
         else if (nextBall0Pos.y + ballSize.y > 80 && currentBall0Pos.y + ballSize.y < 80 && willCollide(nextBall0Pos)) {
             nextBall0Pos.y = (80 - ballSize.y) * 2 - nextBall0Pos.y;
-            ballMovingDegree = - (ballMovingDegree + 90) - 90;
+            ballMovingDegree = - (ballMovingDegree + 90) - 90 - 10 + Math.random() * 20;
         }
         else if (nextBall0Pos.y < 0) {
             nextBall0Pos.y = -nextBall0Pos.y;
-            ballMovingDegree = - (ballMovingDegree + 90) - 90;
+            ballMovingDegree = - (ballMovingDegree + 90) - 90 - 10 + Math.random() * 20;
         }
 
         balls[0].style.left = nextBall0Pos.x + "%";
@@ -378,6 +387,7 @@ window.onresize = function () {
     });
     fontSize = window.innerHeight / 929 * 2 + "em";
     ballSpeedControllerLabel.style.fontSize = fontSize;
+    bombSpeedControllerLabel.style.fontSize = fontSize;
     timeDisplaying.style.fontSize = fontSize;
     failedLabel.style.fontSize = fontSize * 3;
     boundaryOfBar = Math.round(window.innerWidth * (1 - widthOfBar / 100), 0);
@@ -403,17 +413,27 @@ document.onkeydown = function (e) {
                 changeState(IN_PAUSE);
             }
             else if (code == "ArrowUp") {
-                isPressed.up = true;
+                var oldValue = Number(ballSpeedController.value);
+                ballSpeedController.value = (oldValue < 10) ? oldValue + 1 + "" : ballSpeedController.value;
+                changeBallSpeed();
             }
             else if (code == "ArrowDown") {
-                isPressed.down = true;
+                var oldValue = Number(ballSpeedController.value);
+                ballSpeedController.value = (oldValue > 1) ? oldValue - 1 + "" : ballSpeedController.value;
+                changeBallSpeed();
             }
-            else if (code == "ShiftLeft") {
-                isPressed.shift = true;
-                console.log("Shift Pressed");
-            }
+            // else if (code == "ShiftLeft") {
+            //     isPressed.shift = true;
+            // }
             else if (code == "ArrowLeft") {
-
+                var oldValue = Number(bombSpeedController.value);
+                bombSpeedController.value = (oldValue > 1) ? oldValue - 1 + "" : bombSpeedController.value;
+                changeBombFrequency();
+            }
+            else if (code == "ArrowRight") {
+                var oldValue = Number(bombSpeedController.value);
+                bombSpeedController.value = (oldValue < 10) ? oldValue + 1 + "" : bombSpeedController.value;
+                changeBombFrequency();
             }
             break;
         case IN_PAUSE:
@@ -428,41 +448,46 @@ document.onkeydown = function (e) {
     }
 }
 
-document.onkeyup = function (e) {
-    var code = e.code;
-    if (gameState == IN_GAME){
-        if (code == "ShiftLeft") {
-            isPressed.shift = false;
-            console.log("Shift Released");
-        }
-        else if (code == "ArrowUp") {
-            isPressed.up = false;
-            if(isPressed.shift) {
-                console.log("Hey");
-            }
-            else {
-                var oldValue = Number(ballSpeedController.value);
-                ballSpeedController.value = (oldValue < 10) ? oldValue + 1 + "" : ballSpeedController.value;
-                changeSpeed();
-            }
-        }
-        else if (code == "ArrowDown") {
-            isPressed.down = false;
-            if(isPressed.shift) {
-            }
-            else {
-                var oldValue = Number(ballSpeedController.value);
-                ballSpeedController.value = (oldValue > 1) ? oldValue - 1 + "" : ballSpeedController.value;
-                changeSpeed();
-            }
-        }
-    }
-}
+// document.onkeyup = function (e) {
+//     var code = e.code;
+//     if (gameState == IN_GAME) {
+//         if (code == "ShiftLeft") {
+//             isPressed.shift = false;
+//             console.log("Shift Released");
+//         }
+//         else if (code == "ArrowUp") {
+//             isPressed.up = false;
+//             if (isPressed.shift) {
+//                 var oldValue = Number(bombSpeedController.value);
+//                 bombSpeedController.value = (oldValue < 10) ? oldValue + 1 + "" : bombSpeedController.value;
+//                 changeBombFrequency();
+//             }
+//             else {
+//                 var oldValue = Number(ballSpeedController.value);
+//                 ballSpeedController.value = (oldValue < 10) ? oldValue + 1 + "" : ballSpeedController.value;
+//                 changeBallSpeed();
+//             }
+//         }
+//         else if (code == "ArrowDown") {
+//             isPressed.down = false;
+//             if (isPressed.shift) {
+//                 var oldValue = Number(bombSpeedController.value);
+//                 bombSpeedController.value = (oldValue > 1) ? oldValue - 1 + "" : bombSpeedController.value;
+//                 changeBombFrequency();
+//             }
+//             else {
+//                 var oldValue = Number(ballSpeedController.value);
+//                 ballSpeedController.value = (oldValue > 1) ? oldValue - 1 + "" : ballSpeedController.value;
+//                 changeBallSpeed();
+//             }
+//         }
+//     }
+// }
 
-function changeSpeed() {
+function changeBallSpeed() {
     if (gameState == IN_PAUSE) return;
     ballMovingPerUpdate = ballSpeedController.value * 0.1;
-    ballSpeedControllerLabel.innerHTML = ballSpeedControllerLabel.innerHTML.slice(0, 6) + ((ballSpeedController.value > 9) ? ballSpeedController.value : (" " + ballSpeedController.value));
+    ballSpeedControllerLabel.innerHTML = "Ball Speed:" + ((ballSpeedController.value > 9) ? ballSpeedController.value : (" " + ballSpeedController.value));
 }
 
 function changeState(state) {
@@ -483,7 +508,8 @@ function changeState(state) {
                 ballMovingPerUpdate = 0.1;
                 ballMovingDegree = -37;
                 ballSpeedController.value = 1;
-                ballSpeedControllerLabel.innerHTML = "Speed: 1";
+                ballSpeedControllerLabel.innerHTML = "Ball Speed: 1";
+                bombSpeedControllerLabel.innerHTML = "Bomb Density: 1";
                 bombs.forEach(_ => {
                     try {
                         document.body.removeChild(_.bomb);
@@ -504,7 +530,8 @@ function changeState(state) {
                 ballSpeedController.disabled = false;
                 // ballSpeedController.classList.toggle("ballSpeedSlider");
                 // ballSpeedController.classList.toggle("ballSpeedSlider_inPause");
-                set_ballSpeedSettingStyle(true);
+                set_speedSettingStyle(true, false);
+                set_speedSettingStyle(true, true);
             }
             bar.style.visibility = "visible";
             bar.style.opacity = "1";
@@ -512,6 +539,8 @@ function changeState(state) {
             startButton.style.visibility = "hidden";
             ballSpeedControllerLabel.style.visibility = "visible";
             ballSpeedController.style.visibility = "visible";
+            bombSpeedControllerLabel.style.visibility = "visible";
+            bombSpeedController.style.visibility = "visible";
             timeDisplaying.style.visibility = "visible";
             timeDisplaying.style.opacity = "1";
             pauseButton.style.visibility = "visible";
@@ -533,7 +562,10 @@ function changeState(state) {
             pauseButton.style.visibility = "hidden";
             gameState = IN_PAUSE;
             ballSpeedController.disabled = true;
-            set_ballSpeedSettingStyle(false);
+            bombSpeedController.disabled = true;
+            set_speedSettingStyle(false, false);
+            set_speedSettingStyle(false, true);
+            set_
             break;
         case IN_DEAD:
             balls.forEach(_ => {
@@ -550,6 +582,8 @@ function changeState(state) {
             timeDisplaying.style.visibility = "hidden";
             ballSpeedController.style.visibility = "hidden";
             ballSpeedControllerLabel.style.visibility = "hidden";
+            bombSpeedController.style.visibility = "hidden";
+            bombSpeedControllerLabel.style.visibility = "hidden";
             bar.style.visibility = "hidden";
             break;
     }
@@ -567,22 +601,43 @@ function set_Mouse(e) {
     }
 }
 
-function set_ballSpeedSettingStyle(set = false) {
+function set_speedSettingStyle(set = false, isBomb = false) {
     if (set) {
-        ballSpeedSetting.onmouseover = function () {
-            ballSpeedSetting.style.opacity = "1";
-        };
-        ballSpeedSetting.onmouseout = function () {
-            ballSpeedSetting.style.opacity = "0.4";
-        };
-        ballSpeedController.classList.add("ballSpeedSlider");
-        ballSpeedController.classList.remove("ballSpeedSlider_inPause");
+        if (!isBomb) {
+            ballSpeedSetting.onmouseover = function () {
+                ballSpeedSetting.style.opacity = "1";
+            };
+            ballSpeedSetting.onmouseout = function () {
+                ballSpeedSetting.style.opacity = "0.4";
+            };
+            ballSpeedController.classList.add("speedSlider");
+            ballSpeedController.classList.remove("speedSlider_inPause");
+        }
+        else {
+            bombSpeedSetting.onmouseover = function () {
+                bombSpeedSetting.style.opacity = "1";
+            };
+            bombSpeedSetting.onmouseout = function () {
+                bombSpeedSetting.style.opacity = "0.4";
+            };
+            bombSpeedController.classList.add("speedSlider");
+            bombSpeedController.classList.remove("speedSlider_inPause");
+
+        }
     }
     else {
-        ballSpeedSetting.onmouseover = undefined;
-        ballSpeedSetting.onmouseout = undefined;
-        ballSpeedController.classList.remove("ballSpeedSlider");
-        ballSpeedController.classList.add("ballSpeedSlider_inPause");
+        if (!isBomb) {
+            ballSpeedSetting.onmouseover = undefined;
+            ballSpeedSetting.onmouseout = undefined;
+            ballSpeedController.classList.remove("speedSlider");
+            ballSpeedController.classList.add("speedSlider_inPause");
+        }
+        else {
+            bombSpeedSetting.onmouseover = undefined;
+            bombSpeedSetting.onmouseout = undefined;
+            bombSpeedController.classList.remove("speedSlider");
+            bombSpeedController.classList.add("speedSlider_inPause");
+        }
     }
 }
 
@@ -599,5 +654,11 @@ function generateBomb() {
     document.body.appendChild(element);
     var bomb = new BOMB_AND_SPEED_t(element, bombsMovingPerUpdate);
     bombs.push(bomb);
-    setTimeout(generateBomb, Math.random() * 10000 + 1000);
+    setTimeout(generateBomb, Math.random() * bombsFrequency + 1000);
+}
+
+function changeBombFrequency() {
+    if (gameState == IN_PAUSE) return;
+    bombsFrequency = 10000 - bombSpeedController.value * 1000;
+    bombSpeedControllerLabel.innerHTML = "Bomb Density:" + ((bombSpeedController.value > 9) ? bombSpeedController.value : (" " + bombSpeedController.value));
 }
