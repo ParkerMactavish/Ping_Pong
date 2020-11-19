@@ -1,0 +1,149 @@
+﻿<head>
+   <title>Ping-Pong E24066674</title>
+   <script type="text/javascript" src="./ping_pong.js"></script>
+</head>
+<style>
+   body {
+      background-color: #000000;
+      overflow: hidden;
+      width: 100%;
+      cursor: url("cursor.cur"), auto;
+   }
+
+   .speedSetting {
+      position: fixed;
+      width: 15%;
+      height: 8%;
+      opacity: 0.4;
+      background: black;
+      transition: opacity .05s;
+
+      visibility: visible;
+      cursor: pointer;
+   }
+
+   .ballSpeedSetting {
+      top: 90%;
+      left: 82%;
+   }
+
+   .bombSpeedSetting {
+      top: 5%;
+      left: 82%;
+   }
+
+   .speedSettingLabel {
+      -webkit-text-stroke: 1px black;
+      color: #efefef;
+      font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+      cursor: url("cursor.cur"), auto;
+      z-index: 1;
+   }
+
+   .speedSlider {
+      -webkit-appearance: none;
+      position: relative;
+      width: 100%;
+      height: 40%;
+      background: #ffffff;
+      outline: none;
+      cursor: pointer;
+   }
+
+   .speedSlider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 10%;
+      height: 100%;
+      background: #666666;
+      cursor: pointer;
+   }
+
+   .speedSlider_inPause {
+      -webkit-appearance: none;
+      position: relative;
+      width: 100%;
+      height: 40%;
+      background: #ffffff;
+      outline: none;
+      cursor: url("cursor.cur"), auto;
+   }
+
+   .speedSlider_inPause::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 10%;
+      height: 100%;
+      background: #666666;
+      cursor: url("cursor.cur"), auto;
+   }
+
+   .timeDisplaying {
+      position: fixed;
+      width: 20%;
+      height: 6%;
+      top: 80%;
+      left: 3%;
+      color: #efefef;
+      font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+
+      visibility: hidden;
+   }
+
+   .resultDisplaying {
+      color: #efefef;
+      font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+      visibility: hidden;
+      position: absolute;
+   }
+
+   .button:hover {
+      cursor: pointer;
+   }
+</style>
+
+<body onLoad=start()>
+   <img src="ball0.png" id="ball0" style="position: absolute; z-index: 100; visibility: hidden;" />
+   <img src="ball1.png" id="ball1" style="position: absolute; z-index: 99; visibility: hidden;" />
+   <img src="ball2.png" id="ball2" style="position: absolute; z-index: 98; visibility: hidden;" />
+   <img src="ball3.png" id="ball3" style="position: absolute; z-index: 97; visibility: hidden;" />
+   <img src="ball4.png" id="ball4" style="position: absolute; z-index: 96; visibility: hidden;" />
+   <img src="bar.png" id="bar" style="position: absolute; z-index: 95; visibility: hidden;" />
+   <img src="play.png" id="start" class="button" style="position: absolute; visibility: hidden; z-index: 94;"
+      onclick="changeState(IN_GAME);" />
+   <img src="Title.png" id="title" style="position: absolute; visibility: hidden; z-index: 93;" />
+   <img src="pause.png" id="pause" class="button" style="position: absolute; visibility: hidden; z-index: 93;"
+      onclick="changeState(IN_PAUSE)" />
+   <img src="paused_lable.png" id="paused_label" style="position: absolute; visibility: hidden; z-index: 93;" />
+   <img src="question_mark.png" id="show_about" class="button"
+      style="position: absolute; visibility: hidden; z-index: 93;" />
+   <img src="about.png" id="about" style="position: absolute; visibility: hidden; z-index: 100000;" />
+   <div id="failed_label" class="resultDisplaying" align="center">
+      <div id="resultDurationLabel">Time Last:&#10</div>
+      <div id="resultDurationTime"></div>
+      <div id="resultBombLabel">Bomb Escaped:&#10</div>
+      <div id="resultBombCount"></div>
+   </div>
+   <!--img src="restart.png" id="restart" class="button" style="position: absolute; visibility: hidden;"
+      onclick="start(); gameState=IN_MENU;" /-->
+      <img src="restart.png" id="restart" class="button" style="position: absolute; visibility: hidden;"
+      onclick="reloadPage()" />
+   <div class="speedSetting ballSpeedSetting" id="ballSpeedSetting">
+      <div class="speedSettingLabel" id="ballSpeedSettingLabel" align="right">Ball Speed: 1</div>
+      <input type="range" min="1" max="10" value="1" class="speedSlider" id="ballSpeedSlider"
+         onchange=changeBallSpeed()>
+   </div>
+   <div class="speedSetting bombSpeedSetting" id="bombSpeedSetting">
+      <div class="speedSettingLabel" id="bombSpeedSettingLabel" align="right">Bomb Density: 1</div>
+      <input type="range" min="1" max="10" value="1" class="speedSlider" id="bombSpeedSlider"
+         onchange=changeBombFrequency()>
+   </div>
+   <div class="timeDisplaying" id="timeDisplaying">
+      <div id="bombCountLabel">Bomb Escaped:&#10</div>
+      <div id="bombCount"></div>
+      <div class="durationLabel" id="durationLabel">Time:&#10</div>
+      <div id="durationTime"></div>
+   </div>
+</body>
+
+</html>
